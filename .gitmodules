@@ -1,0 +1,9 @@
+[submodule "FOS.Users.Api/FOS.Users.Api/fos-repository"]
+	path = FOS.Users.Api/FOS.Users.Api/fos-repository
+	url = https://github.com/SrivasiniInfotech-2011/fos-repository
+[submodule "FOS.Users.Api/FOS.Users.Api/fos-models"]
+	path = FOS.Users.Api/FOS.Users.Api/fos-models
+	url = https://github.com/SrivasiniInfotech-2011/fos-models.git
+[submodule "FOS.Users.Api/FOS.Users.Api/fos-infrastructure"]
+	path = FOS.Users.Api/FOS.Users.Api/fos-infrastructure
+	url = https://github.com/SrivasiniInfotech-2011/fos-infrastructure.git
