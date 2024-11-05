@@ -30,7 +30,7 @@ builder.Services.AddAuthentication(IdentityServerAuthenticationDefaults.Authenti
              .AddIdentityServerAuthentication(options =>
              {
                  options.Authority = "https://localhost:7020/";
-                 options.ApiName = Constants.ApiResource.DataEventRecordsApi;
+                 options.ApiName = Constants.ApiResource.UserApi;
                  options.ApiSecret = Constants.ApiResource.ApiResourceSecret;
              });
 builder.Services.AddCors(options =>
