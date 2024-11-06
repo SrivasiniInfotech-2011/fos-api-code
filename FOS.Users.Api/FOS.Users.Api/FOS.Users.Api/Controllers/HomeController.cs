@@ -1,7 +1,7 @@
-﻿using AMS.API.Services.Queries;
-using FOS.Infrastructure.Services.IdentityServices;
+﻿using FOS.Infrastructure.Queries;
 using FOS.Models.Responses;
-using Microsoft.AspNetCore.Http;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using static FOS.Models.Constants.Constants;
 
@@ -9,8 +9,17 @@ namespace FOS.Users.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class HomeController : ControllerBase
+    [Authorize]
+    public class HomeController : FOSControllerBase
     {
+        /// <summary>
+        /// Constructor For <see cref="HomeController"/>
+        /// </summary>
+        /// <param name="mediator"></param>
+        public HomeController(IMediator mediator, ILogger<UsersController> logger) : base(mediator, logger)
+        {
+
+        }
         /// <summary>
         /// Gets the user's details.
         /// </summary>
@@ -31,14 +40,12 @@ namespace FOS.Users.Api.Controllers
             try
             {
                 ArgumentNullException.ThrowIfNull(userId, nameof(userId));
-                var query = new GetUserByUserNameAndPassword.Query(loginRequest.UserName, loginRequest.Password);
-                var user = await FOSMediator.Send(query);
-                var userToken = await IdentityServer4Client.LoginAsync(loginRequest.UserName, loginRequest.Password);
-
+                var query = new GetUserMenusByUserId.Query(userId.Value);
+                var userMenus = await FOSMediator.Send(query);
                 return Ok(new FOSResponse
                 {
                     Status = Status.Success,
-                    Message = new { User = user, Token = userToken.AccessToken }
+                    Message = new { UserMenus = userMenus }
                 });
             }
             catch (Exception ex)
@@ -47,7 +54,7 @@ namespace FOS.Users.Api.Controllers
                 {
                     StatusCode = System.Net.HttpStatusCode.BadRequest,
                     Error = new FOSErrorResponse { Exception = ex },
-                    Request = loginRequest
+                    Request = userId
                 });
             }
         }

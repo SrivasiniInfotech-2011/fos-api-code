@@ -1,10 +1,12 @@
-﻿using AMS.API.Services.Queries;
+﻿using FOS.Infrastructure.Queries;
 using FOS.Infrastructure.Services.IdentityServices;
+using FOS.Models.Constants;
 using FOS.Models.Entities;
 using FOS.Models.Requests;
 using FOS.Models.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using System.Reflection.Metadata;
 using static FOS.Models.Constants.Constants;
 
 namespace FOS.Users.Api.Controllers
@@ -13,13 +15,14 @@ namespace FOS.Users.Api.Controllers
     [ApiController]
     public class UsersController : FOSControllerBase
     {
+        private readonly IConfiguration _configuration;
         /// <summary>
         /// Constructor For ApartmentsController
         /// </summary>
         /// <param name="mediator"></param>
-        public UsersController(IMediator mediator,ILogger<UsersController> logger):base(mediator,logger)
+        public UsersController(IConfiguration configuration,IMediator mediator,ILogger<UsersController> logger):base(mediator,logger)
         {
-            
+            _configuration = configuration;
         }
 
         /// <summary>
@@ -59,9 +62,10 @@ namespace FOS.Users.Api.Controllers
             {
                 ArgumentNullException.ThrowIfNull(loginRequest.UserName, nameof(loginRequest.UserName));
                 ArgumentNullException.ThrowIfNull(loginRequest.Password, nameof(loginRequest.Password));
+
                 var query = new GetUserByUserNameAndPassword.Query(loginRequest.UserName, loginRequest.Password);
                 var user = await FOSMediator.Send(query);
-                var userToken = await IdentityServer4Client.LoginAsync(loginRequest.UserName, loginRequest.Password);
+                var userToken = await IdentityServer4Client.LoginAsync(_configuration[Constants.IdentityServerConfigurationKey]!,loginRequest.UserName, loginRequest.Password);
 
                 return Ok(new FOSResponse
                 {

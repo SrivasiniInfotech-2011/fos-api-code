@@ -1,4 +1,4 @@
-using AMS.API.Services.Queries;
+using FOS.Infrastructure.Queries;
 using FOS.Models.Constants;
 using FOS.Models.Entities;
 using FOS.Repository.Implementors;
@@ -16,7 +16,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddCors();
 builder.Services.AddControllers();
-var configuration=builder.Configuration
+var configuration = builder.Configuration
                          .AddJsonFile($"appsettings.json")
                          .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json")
                          .Build();
@@ -29,14 +29,14 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddAuthentication(IdentityServerAuthenticationDefaults.AuthenticationScheme)
              .AddIdentityServerAuthentication(options =>
              {
-                 options.Authority = "https://localhost:7020/";
+                 options.Authority = configuration["IdentityServerUrl"];
                  options.ApiName = Constants.ApiResource.UserApi;
                  options.ApiSecret = Constants.ApiResource.ApiResourceSecret;
              });
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngularApp",
-        builder => builder.WithOrigins("http://localhost:4200")
+        builder => builder.WithOrigins(new string[] { configuration["AllowCORSUrls"]! })
                           .AllowAnyMethod()
                           .AllowAnyHeader()
                           .AllowCredentials());
@@ -58,6 +58,7 @@ builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 builder.Services.AddTransient<IMediator, Mediator>();
 builder.Services.AddTransient<IUserRepository>(s => new UserRepository(configuration.GetConnectionString("FOSConnectionString")!));
 builder.Services.AddTransient<IRequestHandler<GetUserByUserNameAndPassword.Query, User?>, GetUserByUserNameAndPassword.Handler>();
+builder.Services.AddTransient<IRequestHandler<GetUserMenusByUserId.Query, List<UserMenu>>, GetUserMenusByUserId.Handler>();
 builder.Host.UseSerilog((context, configuration) =>
     configuration.ReadFrom.Configuration(context.Configuration));
 
