@@ -1,4 +1,5 @@
-﻿using FOS.Infrastructure.Queries;
+﻿using AutoMapper;
+using FOS.Infrastructure.Queries;
 using FOS.Infrastructure.Services.IdentityServices;
 using FOS.Models.Constants;
 using FOS.Models.Entities;
@@ -20,7 +21,7 @@ namespace FOS.Users.Api.Controllers
         /// Constructor For ApartmentsController
         /// </summary>
         /// <param name="mediator"></param>
-        public UsersController(IConfiguration configuration,IMediator mediator,ILogger<UsersController> logger):base(mediator,logger)
+        public UsersController(IConfiguration configuration,IMediator mediator,IMapper mapper, ILogger<UsersController> logger):base(mediator,logger,mapper)
         {
             _configuration = configuration;
         }
@@ -62,7 +63,6 @@ namespace FOS.Users.Api.Controllers
             {
                 ArgumentNullException.ThrowIfNull(loginRequest.UserName, nameof(loginRequest.UserName));
                 ArgumentNullException.ThrowIfNull(loginRequest.Password, nameof(loginRequest.Password));
-
                 var query = new GetUserByUserNameAndPassword.Query(loginRequest.UserName, loginRequest.Password);
                 var user = await FOSMediator.Send(query);
                 var userToken = await IdentityServer4Client.LoginAsync(_configuration[Constants.IdentityServerConfigurationKey]!,loginRequest.UserName, loginRequest.Password);
@@ -79,7 +79,8 @@ namespace FOS.Users.Api.Controllers
                 {
                     StatusCode = System.Net.HttpStatusCode.BadRequest,
                     Error = new FOSErrorResponse { Exception = ex },
-                    Request = loginRequest
+                    Request = loginRequest,
+                    
                 });
             }
         }

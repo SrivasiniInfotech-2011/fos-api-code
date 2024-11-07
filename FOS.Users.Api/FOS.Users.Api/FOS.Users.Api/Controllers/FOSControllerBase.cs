@@ -21,7 +21,7 @@ public class FOSControllerBase(IMediator mediator, ILogger<FOSControllerBase> lo
     /// <param name="mediator">The mediator instance for handling requests.</param>
     /// <param name="logger">The logger instance for logging information.</param>
     /// <param name="mapper">The mapper instance for object mapping.</param>
-    public FOSControllerBase(IMediator mediator, ILogger<FOSControllerBase> logger, IMapper mapper) : this(mediator, logger) => HLObjectMapper = mapper;
+    public FOSControllerBase(IMediator mediator, ILogger<FOSControllerBase> logger, IMapper mapper) : this(mediator, logger) => FOSObjectMapper = mapper;
 
     /// <summary>Gets the <see cref="IMediator"/> instance</summary>
     protected IMediator FOSMediator => mediator;
@@ -29,7 +29,7 @@ public class FOSControllerBase(IMediator mediator, ILogger<FOSControllerBase> lo
     /// <summary>
     /// Gets the <see cref="IMapper"/> instance
     /// </summary>
-    private IMapper HLObjectMapper { get; } = default!;
+    private IMapper FOSObjectMapper { get; } = default!;
 
     /// <summary>
     /// Generates an error response based on the provided command response.
@@ -62,7 +62,7 @@ public class FOSControllerBase(IMediator mediator, ILogger<FOSControllerBase> lo
         var methodName = $"{GetType().Name}.{nameof(BuildErrorResponse)}";
 
         // Map the exception to a base response object
-        var response = HLObjectMapper.Map<FOSBaseResponse>(exception);
+        var response = FOSObjectMapper.Map<FOSBaseResponse>(exception);
 
         // Handle different types of exceptions
         switch (exception)
@@ -80,7 +80,7 @@ public class FOSControllerBase(IMediator mediator, ILogger<FOSControllerBase> lo
                 logger.LogDebug("{MethodName}: Error in message handler: {Error}", methodName, JsonConvert.SerializeObject(messageHandlerEx));
 
                 // Map the message handler exception to a response
-                response = HLObjectMapper.Map<FOSBaseResponse>(messageHandlerEx);
+                response = FOSObjectMapper.Map<FOSBaseResponse>(messageHandlerEx);
                 response.Error.AdditionalData = new Dictionary<string, object>
                 {
                     { "requestType", messageHandlerEx.Response.RequestType?.Name ?? String.Empty },
@@ -89,7 +89,7 @@ public class FOSControllerBase(IMediator mediator, ILogger<FOSControllerBase> lo
                 break;
             default:
                 // Map the exception to an inner error response for other exception types
-                response.Error.InnerError = HLObjectMapper.Map<FOSErrorResponse>(exception);
+                response.Error.InnerError = FOSObjectMapper.Map<FOSErrorResponse>(exception);
                 break;
         }
 
