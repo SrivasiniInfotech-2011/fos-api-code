@@ -32,6 +32,7 @@ builder.Services.AddAuthentication(IdentityServerAuthenticationDefaults.Authenti
                  options.Authority = configuration["IdentityServerUrl"];
                  options.ApiName = Constants.ApiResource.UserApi;
                  options.ApiSecret = Constants.ApiResource.ApiResourceSecret;
+                 options.RequireHttpsMetadata = false;
              });
 builder.Services.AddCors(options =>
 {
