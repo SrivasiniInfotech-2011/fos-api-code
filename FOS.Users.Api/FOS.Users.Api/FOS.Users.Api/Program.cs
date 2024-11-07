@@ -53,8 +53,8 @@ builder.Services.AddCors(options =>
 //            corsBuilder.WithMethods(ApiConfiguration.Global.Cors?.AllowedMethods!);
 //        });
 //});
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Startup>());
-builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<FOS.Users.Api.Startup>());
+builder.Services.AddAutoMapper(Assembly.GetAssembly(typeof(FOS.Models.Constants.Startup)));
 builder.Services.AddTransient<IMediator, Mediator>();
 builder.Services.AddTransient<IUserRepository>(s => new UserRepository(configuration.GetConnectionString("FOSConnectionString")!));
 builder.Services.AddTransient<IRequestHandler<GetUserByUserNameAndPassword.Query, User?>, GetUserByUserNameAndPassword.Handler>();
