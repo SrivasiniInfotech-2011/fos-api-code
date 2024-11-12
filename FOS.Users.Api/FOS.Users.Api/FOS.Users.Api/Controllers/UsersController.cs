@@ -21,7 +21,7 @@ namespace FOS.Users.Api.Controllers
         /// Constructor For ApartmentsController
         /// </summary>
         /// <param name="mediator"></param>
-        public UsersController(IConfiguration configuration,IMediator mediator,IMapper mapper, ILogger<UsersController> logger):base(mediator,logger,mapper)
+        public UsersController(IConfiguration configuration, IMediator mediator, IMapper mapper, ILogger<UsersController> logger) : base(mediator, logger, mapper)
         {
             _configuration = configuration;
         }
@@ -65,8 +65,17 @@ namespace FOS.Users.Api.Controllers
                 ArgumentNullException.ThrowIfNull(loginRequest.Password, nameof(loginRequest.Password));
                 var query = new GetUserByUserNameAndPassword.Query(loginRequest.UserName, loginRequest.Password);
                 var user = await FOSMediator.Send(query);
-                var userToken = await IdentityServer4Client.LoginAsync(_configuration[Constants.IdentityServerConfigurationKey]!,loginRequest.UserName, loginRequest.Password);
+                if (user == null)
+                    return new BadRequestObjectResult(new Models.Responses.FOSMessageResponse
+                    {
+                        StatusCode = System.Net.HttpStatusCode.BadRequest,
+                        Error = new FOSErrorResponse
+                        {
+                            Message = Constants.Messages.INVALID_USER,
+                        }
+                    });
 
+                var userToken = await IdentityServer4Client.LoginAsync(_configuration[Constants.IdentityServerConfigurationKey]!, loginRequest.UserName, loginRequest.Password);
                 return Ok(new FOSResponse
                 {
                     Status = Status.Success,
@@ -80,7 +89,7 @@ namespace FOS.Users.Api.Controllers
                     StatusCode = System.Net.HttpStatusCode.BadRequest,
                     Error = new FOSErrorResponse { Exception = ex },
                     Request = loginRequest,
-                    
+
                 });
             }
         }
