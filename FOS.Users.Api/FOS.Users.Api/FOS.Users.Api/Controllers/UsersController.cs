@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using FOS.Infrastructure.Queries;
 using FOS.Infrastructure.Services.IdentityServices;
+using FOS.Infrastructure.Services.Utils;
 using FOS.Models.Constants;
 using FOS.Models.Entities;
 using FOS.Models.Requests;
@@ -65,7 +66,7 @@ namespace FOS.Users.Api.Controllers
                 ArgumentNullException.ThrowIfNull(loginRequest.Password, nameof(loginRequest.Password));
                 var query = new GetUserByUserNameAndPassword.Query(loginRequest.UserName, loginRequest.Password);
                 var user = await FOSMediator.Send(query);
-                if (user == null)
+                if (user == null || (user != null && AppUtil.DecryptString(user.Passsword) != loginRequest.Password))
                     return new BadRequestObjectResult(new Models.Responses.FOSMessageResponse
                     {
                         StatusCode = System.Net.HttpStatusCode.BadRequest,
@@ -75,13 +76,13 @@ namespace FOS.Users.Api.Controllers
                         }
                     });
 
-                var userToken = await IdentityServer4Client.LoginAsync(_configuration[Constants.IdentityServerConfigurationKey]!, loginRequest.UserName, loginRequest.Password);
-                return Ok(new FOSResponse
-                {
-                    Status = Status.Success,
-                    Message = new { User = user, Token = userToken.AccessToken }
-                });
-            }
+                    var userToken = await IdentityServer4Client.LoginAsync(_configuration[Constants.IdentityServerConfigurationKey]!, loginRequest.UserName, loginRequest.Password);
+                    return Ok(new FOSResponse
+                    {
+                        Status = Status.Success,
+                        Message = new { User = user, Token = userToken.AccessToken }
+                    });
+                }
             catch (Exception ex)
             {
                 return ErrorResponse(new Models.Responses.FOSMessageResponse
