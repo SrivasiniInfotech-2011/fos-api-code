@@ -7,7 +7,11 @@ using FOS.Models.Requests;
 using FOS.Models.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 using System.Reflection.Metadata;
+using System.Security.Claims;
+using System.Text;
 using static FOS.Models.Constants.Constants;
 
 namespace FOS.Users.Api.Controllers
@@ -76,10 +80,11 @@ namespace FOS.Users.Api.Controllers
                     });
 
                 var userToken = await IdentityServer4Client.LoginAsync(_configuration[Constants.IdentityServerConfigurationKey]!, loginRequest.UserName, loginRequest.Password);
+                user.SessionExpireDate = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + userToken.ExpiresIn;
                 return Ok(new FOSResponse
                 {
                     Status = Status.Success,
-                    Message = new { User = user, Token = userToken.AccessToken }
+                    Message = new { User = user, Token = userToken.AccessToken, RefreshToken = userToken.RefreshToken }
                 });
             }
             catch (Exception ex)
@@ -94,36 +99,25 @@ namespace FOS.Users.Api.Controllers
             }
         }
 
-
-        /// <summary>
-        /// Create an User.
-        /// </summary>
-        /// <param name="user"></param>
-        /// <returns></returns>
         [HttpPost]
-        [Route("CreateUser")]
-        public async Task<IActionResult> CreateApartment([FromBody] User user)
+        [Route("RefreshToken")]
+        public async Task<IActionResult> RefreshToken(TokenModel tokenModel)
         {
-            //var newUser = await mediator.Send(new CreateUser.Command(user));
+            if (tokenModel is null)
+            {
+                return BadRequest("Invalid client request");
+            }
 
-            //return Ok(newUser);
-            return Ok();
-        }
+            string? accessToken = tokenModel.AccessToken;
+            string? refreshToken = tokenModel.RefreshToken;
 
-        /// <summary>
-        /// Update a User.
-        /// </summary>
-        /// <param name="user"></param>
-        /// <returns></returns>
-        [HttpPut]
-        [Route("UpdateUser/{id}")]
-        public async Task<IActionResult> UpdateApartment(int id, [FromBody] User user)
-        {
-            //user.UserId = id;
-            //await mediator.Send(new UpdateUser.Command(user));
-
-            //return Ok("Success");
-            return Ok();
+            var userToken = await IdentityServer4Client.RunRefreshAsync(refreshToken!);
+            var sessionExpireDate = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + userToken.ExpiresIn;
+            return Ok(new FOSResponse
+            {
+                Status = Status.Success,
+                Message = new { SessionExpireDate = sessionExpireDate, AccessToken = userToken.AccessToken, RefreshToken = userToken.RefreshToken }
+            });
         }
 
         /// <summary>
@@ -139,6 +133,26 @@ namespace FOS.Users.Api.Controllers
 
             //return Ok("Success");
             return Ok();
+        }
+
+        private ClaimsPrincipal? GetPrincipalFromExpiredToken(string? token)
+        {
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateAudience = false,
+                ValidateIssuer = false,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"])),
+                ValidateLifetime = false
+            };
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
+            if (securityToken is not JwtSecurityToken jwtSecurityToken || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+                throw new SecurityTokenException("Invalid token");
+
+            return principal;
+
         }
     }
 }
