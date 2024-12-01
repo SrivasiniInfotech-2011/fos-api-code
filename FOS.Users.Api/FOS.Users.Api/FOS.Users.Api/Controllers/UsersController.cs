@@ -27,7 +27,6 @@ namespace FOS.Users.Api.Controllers
         /// </summary>
         /// <param name="mediator"></param>
         public UsersController(IConfiguration configuration, IMediator mediator, IMapper mapper, ILogger<UsersController> logger) : base(mediator, logger, mapper)
-        public UsersController(IConfiguration configuration, IMediator mediator, IMapper mapper, ILogger<UsersController> logger) : base(mediator, logger, mapper)
         {
             _configuration = configuration;
         }
