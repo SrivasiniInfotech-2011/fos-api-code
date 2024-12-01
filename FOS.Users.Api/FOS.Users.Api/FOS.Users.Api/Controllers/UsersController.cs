@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using FOS.Infrastructure.Queries;
 using FOS.Infrastructure.Services.IdentityServices;
+using FOS.Infrastructure.Services.Utils;
 using FOS.Models.Constants;
 using FOS.Models.Entities;
 using FOS.Models.Requests;
@@ -25,6 +26,7 @@ namespace FOS.Users.Api.Controllers
         /// Constructor For ApartmentsController
         /// </summary>
         /// <param name="mediator"></param>
+        public UsersController(IConfiguration configuration, IMediator mediator, IMapper mapper, ILogger<UsersController> logger) : base(mediator, logger, mapper)
         public UsersController(IConfiguration configuration, IMediator mediator, IMapper mapper, ILogger<UsersController> logger) : base(mediator, logger, mapper)
         {
             _configuration = configuration;
