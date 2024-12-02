@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FOS.Infrastructure.Commands;
 using FOS.Infrastructure.Queries;
 using FOS.Models.Requests;
 using FOS.Models.Responses;
@@ -88,6 +89,44 @@ namespace FOS.Users.Api.Controllers
                     StatusCode = System.Net.HttpStatusCode.BadRequest,
                     Error = new FOSErrorResponse { Exception = ex }
 
+                });
+            }
+        }
+
+
+
+
+
+        /// <summary>
+        /// Creates a User Details ,Insert.
+        /// </summary>
+        /// <param name="prospectRequest">Prospect Request.</param>
+        /// <returns>A <see cref="Task{IActionResult}"/> representing the result of the asynchronous operation.</returns>
+        /// <response code="200">Returns the user's requests as a byte array.</response>
+        /// <response code="400">If the query is invalid or the message handler response status is not OK.</response>
+        /// <response code="401">Returns if the user is unauthorized.</response>
+        /// <response code="500">If an internal server error occurs.</response>
+        [HttpPost]
+        [Route("UserInsert")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(byte[]), StatusCodes.Status200OK, Web.ContentType.Json)]
+        [ProducesResponseType(typeof(FOSBaseResponse), StatusCodes.Status400BadRequest, Web.ContentType.Json)]
+        [ProducesResponseType(typeof(FOSBaseResponse), StatusCodes.Status500InternalServerError, Web.ContentType.Json)]
+
+        public async Task<IActionResult> UserDetailsInsert(CreateProspectRequestModel prospectRequest)
+        {
+            try
+            {
+                var command = new CreateProspectCommand.Command(prospectRequest);
+                var response = await FOSMediator.Send(command);
+                return GenerateResponse(response);
+            }
+            catch (Exception ex)
+            {
+                return ErrorResponse(new Models.Responses.FOSMessageResponse
+                {
+                    StatusCode = System.Net.HttpStatusCode.BadRequest,
+                    Error = new FOSErrorResponse { Exception = ex }
                 });
             }
         }
