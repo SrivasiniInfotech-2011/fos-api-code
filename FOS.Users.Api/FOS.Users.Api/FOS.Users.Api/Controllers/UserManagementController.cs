@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using FOS.Infrastructure.Commands;
 using FOS.Infrastructure.Queries;
+using FOS.Models.Entities;
 using FOS.Models.Requests;
 using FOS.Models.Responses;
 using MediatR;
@@ -108,16 +109,16 @@ namespace FOS.Users.Api.Controllers
         /// <response code="500">If an internal server error occurs.</response>
         [HttpPost]
         [Route("UserInsert")]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]       
         [ProducesResponseType(typeof(byte[]), StatusCodes.Status200OK, Web.ContentType.Json)]
         [ProducesResponseType(typeof(FOSBaseResponse), StatusCodes.Status400BadRequest, Web.ContentType.Json)]
         [ProducesResponseType(typeof(FOSBaseResponse), StatusCodes.Status500InternalServerError, Web.ContentType.Json)]
 
-        public async Task<IActionResult> UserDetailsInsert(CreateProspectRequestModel prospectRequest)
+        public async Task<IActionResult> UserDetailsInsert(UserInsertDetailsModel newUserdetails)
         {
             try
             {
-                var command = new CreateProspectCommand.Command(prospectRequest);
+                var command = new UserdetailsInsert.Command(newUserdetails);
                 var response = await FOSMediator.Send(command);
                 return GenerateResponse(response);
             }
@@ -129,6 +130,47 @@ namespace FOS.Users.Api.Controllers
                     Error = new FOSErrorResponse { Exception = ex }
                 });
             }
+        }
+
+
+
+
+        /// <summary>
+        /// Generate Response based on SaveStatus.
+        /// </summary>
+        /// <param name="response">Response from the Stored Procedure.</param>
+        /// <returns>response of type <see cref="IActionResult"/></returns>
+        private IActionResult GenerateResponse(int response)
+        {
+            if (response == (int)SaveStatus.OK)
+            {
+                return Ok(new FOSResponse
+                {
+                    Status = Status.Success,
+                    Message = "User Created successfully"
+                });
+            }
+            else
+            {
+                return BadRequest(new FOSResponse
+                {
+                    Status = Status.Error,
+                    Message = "An error occurred while creating the user"
+                });
+            }
+            //else if (response == (int)SaveStatus.AADHARALREADYEXISTS)
+            //    return new BadRequestObjectResult(new Models.Responses.FOSMessageResponse
+            //    {
+            //        StatusCode = System.Net.HttpStatusCode.BadRequest,
+            //        Error = new FOSErrorResponse { Message = Constants.Messages.PROSPECT_AADHAR_ALREADY_EXISTS }
+            //    });
+            //else if (response == (int)SaveStatus.PANALREADYEXISTS)
+            //    return new BadRequestObjectResult(new Models.Responses.FOSMessageResponse
+            //    {
+            //        StatusCode = System.Net.HttpStatusCode.BadRequest,
+            //        Error = new FOSErrorResponse { Message = Constants.Messages.PROSPECT_PAN_ALREADY_EXISTS }
+            //    });
+            return new BadRequestResult();
         }
 
     }
