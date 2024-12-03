@@ -60,6 +60,10 @@ builder.Services.AddTransient<IMediator, Mediator>();
 builder.Services.AddTransient<IUserRepository>(s => new UserRepository(configuration.GetConnectionString("FOSConnectionString")!));
 builder.Services.AddTransient<IRequestHandler<GetUserByUserNameAndPassword.Query, User?>, GetUserByUserNameAndPassword.Handler>();
 builder.Services.AddTransient<IRequestHandler<GetUserMenusByUserId.Query, List<UserMenu>>, GetUserMenusByUserId.Handler>();
+
+builder.Services.AddTransient<IUsermanagementRepository>(s => new UserManagementRepository(configuration.GetConnectionString("FOSConnectionString")!));
+builder.Services.AddTransient<IRequestHandler<UserLevelLookup.Query, List<Lookup>>, UserLevelLookup.Handler>();
+builder.Services.AddTransient<IRequestHandler<GetUserdesignationlevelLookups.Query, List<Lookup>>, GetUserdesignationlevelLookups.Handler>();
 builder.Host.UseSerilog((context, configuration) =>
     configuration.ReadFrom.Configuration(context.Configuration));
 
