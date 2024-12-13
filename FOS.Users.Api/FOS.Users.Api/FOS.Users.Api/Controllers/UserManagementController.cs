@@ -35,11 +35,11 @@ namespace FOS.Users.Api.Controllers
         [ProducesResponseType(typeof(FOSBaseResponse), StatusCodes.Status400BadRequest, Web.ContentType.Json)]
         [ProducesResponseType(typeof(FOSBaseResponse), StatusCodes.Status500InternalServerError, Web.ContentType.Json)]
 
-        public async Task<IActionResult> GetUserLevelLookup(UsermanagementLookupRequest usermanagementlookup)
+        public async Task<IActionResult> GetUserLevelLookup(UserManagementLookupRequest userManagementLookup)
         {
             try
             {
-                var query = new UserLevelLookup.Query(usermanagementlookup.UserId,usermanagementlookup.CompanyId);
+                var query = new UserLevelLookup.Query(userManagementLookup.UserId, userManagementLookup.CompanyId);
                 var lookup = await FOSMediator.Send(query);
 
                 return Ok(new FOSResponse
@@ -70,11 +70,11 @@ namespace FOS.Users.Api.Controllers
         [ProducesResponseType(typeof(FOSBaseResponse), StatusCodes.Status400BadRequest, Web.ContentType.Json)]
         [ProducesResponseType(typeof(FOSBaseResponse), StatusCodes.Status500InternalServerError, Web.ContentType.Json)]
 
-        public async Task<IActionResult> GetUserdesignationlevelLookup()
+        public async Task<IActionResult> GetUserdesignationlevelLookup(UserDesinationModelRequest UserDesination)
         {
             try
             {
-                var query = new GetUserdesignationlevelLookups.Query();
+                var query = new GetUserDesignationlevelLookups.Query(UserDesination.CompanyId);
                 var lookup = await FOSMediator.Send(query);
 
                 return Ok(new FOSResponse
@@ -99,9 +99,8 @@ namespace FOS.Users.Api.Controllers
 
 
         /// <summary>
-        /// Creates a User Details ,Insert.
+        /// Creates a User Details ,
         /// </summary>
-        /// <param name="prospectRequest">Prospect Request.</param>
         /// <returns>A <see cref="Task{IActionResult}"/> representing the result of the asynchronous operation.</returns>
         /// <response code="200">Returns the user's requests as a byte array.</response>
         /// <response code="400">If the query is invalid or the message handler response status is not OK.</response>
@@ -114,11 +113,11 @@ namespace FOS.Users.Api.Controllers
         [ProducesResponseType(typeof(FOSBaseResponse), StatusCodes.Status400BadRequest, Web.ContentType.Json)]
         [ProducesResponseType(typeof(FOSBaseResponse), StatusCodes.Status500InternalServerError, Web.ContentType.Json)]
 
-        public async Task<IActionResult> UserDetailsInsert(UserInsertDetailsModel newUserdetails)
+        public async Task<IActionResult> UserDetailsInsert(InsertUserDetailsModel newUserdetails)
         {
             try
             {
-                var command = new UserdetailsInsert.Command(newUserdetails);
+                var command = new InsertUserDetails.Command(newUserdetails);
                 var response = await FOSMediator.Send(command);
                 return GenerateResponse(response);
             }
@@ -158,19 +157,91 @@ namespace FOS.Users.Api.Controllers
                     Message = "An error occurred while creating the user"
                 });
             }
-            //else if (response == (int)SaveStatus.AADHARALREADYEXISTS)
-            //    return new BadRequestObjectResult(new Models.Responses.FOSMessageResponse
-            //    {
-            //        StatusCode = System.Net.HttpStatusCode.BadRequest,
-            //        Error = new FOSErrorResponse { Message = Constants.Messages.PROSPECT_AADHAR_ALREADY_EXISTS }
-            //    });
-            //else if (response == (int)SaveStatus.PANALREADYEXISTS)
-            //    return new BadRequestObjectResult(new Models.Responses.FOSMessageResponse
-            //    {
-            //        StatusCode = System.Net.HttpStatusCode.BadRequest,
-            //        Error = new FOSErrorResponse { Message = Constants.Messages.PROSPECT_PAN_ALREADY_EXISTS }
-            //    });
-            return new BadRequestResult();
+           
+        }
+
+
+
+
+        /// <summary>
+        /// UserDetails View  .
+        /// </summary>
+        /// <returns>A <see cref="Task{IActionResult}"/> representing the result of the asynchronous operation.</returns>
+        /// <response code="200">Returns the user's requests as a byte array.</response>
+        /// <response code="400">If the query is invalid or the message handler response status is not OK.</response>
+        /// <response code="401">Returns if the user is unauthorized.</response>
+        /// <response code="500">If an internal server error occurs.</response>
+        [HttpPost]
+        [Route("GetExistingUserDetails")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(byte[]), StatusCodes.Status200OK, Web.ContentType.Json)]
+        [ProducesResponseType(typeof(FOSBaseResponse), StatusCodes.Status400BadRequest, Web.ContentType.Json)]
+        [ProducesResponseType(typeof(FOSBaseResponse), StatusCodes.Status500InternalServerError, Web.ContentType.Json)]
+
+        public async Task<IActionResult> GetExistingUserDetails(GetUserDetailsRequest getUerrequest)
+        {
+            try
+            {
+                var query = new ViewUserDetails.Query(getUerrequest.UserId, getUerrequest.CompanyId);
+                var existingUserDetails = await FOSMediator.Send(query);
+
+                return Ok(new FOSResponse
+                {
+                    Status = Status.Success,
+                    Message = existingUserDetails
+                });
+            }
+            catch (Exception ex)
+            {
+                return ErrorResponse(new Models.Responses.FOSMessageResponse
+                {
+                    StatusCode = System.Net.HttpStatusCode.BadRequest,
+                    Error = new FOSErrorResponse { Exception = ex }
+
+                });
+            }
+        }
+
+
+
+
+        /// <summary>
+        /// GetUserTranslander  .
+        /// </summary>
+        /// <returns>A <see cref="Task{IActionResult}"/> representing the result of the asynchronous operation.</returns>
+        /// <response code="200">Returns the user's requests as a byte array.</response>
+        /// <response code="400">If the query is invalid or the message handler response status is not OK.</response>
+        /// <response code="401">Returns if the user is unauthorized.</response>
+        /// <response code="500">If an internal server error occurs.</response>
+        [HttpPost]
+        [Route("GetUserTranslander")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(byte[]), StatusCodes.Status200OK, Web.ContentType.Json)]
+        [ProducesResponseType(typeof(FOSBaseResponse), StatusCodes.Status400BadRequest, Web.ContentType.Json)]
+        [ProducesResponseType(typeof(FOSBaseResponse), StatusCodes.Status500InternalServerError, Web.ContentType.Json)]
+
+        public async Task<IActionResult> GetUserTranslander(GetUserTranslanderRequest getUertranslanderrequest)
+        {
+            try
+            {
+                var query = new GetUsertranslanderInfrastructure.Query(getUertranslanderrequest.UserId, getUertranslanderrequest.CompanyId);
+                var existingUserDetails = await FOSMediator.Send(query);
+
+                return Ok(new FOSResponse
+                {
+                    Status = Status.Success,
+                    Message = existingUserDetails
+                });
+            }
+            catch (Exception ex)
+            {
+                return ErrorResponse(new Models.Responses.FOSMessageResponse
+                {
+                    StatusCode = System.Net.HttpStatusCode.BadRequest,
+                    Error = new FOSErrorResponse { Exception = ex }
+
+                });
+            }
         }
 
     }

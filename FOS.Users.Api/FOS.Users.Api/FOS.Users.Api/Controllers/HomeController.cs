@@ -16,7 +16,7 @@ namespace FOS.Users.Api.Controllers
         /// Constructor For <see cref="HomeController"/>
         /// </summary>
         /// <param name="mediator"></param>
-        public HomeController(IMediator mediator, ILogger<UsersController> logger) : base(mediator, logger)
+        public HomeController(IMediator mediator, ILogger<AuthController> logger) : base(mediator, logger)
         {
 
         }

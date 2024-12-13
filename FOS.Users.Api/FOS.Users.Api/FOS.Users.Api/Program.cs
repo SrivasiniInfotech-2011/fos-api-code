@@ -1,6 +1,7 @@
 using FOS.Infrastructure.Queries;
 using FOS.Models.Constants;
 using FOS.Models.Entities;
+using FOS.Models.Requests;
 using FOS.Repository.Implementors;
 using FOS.Repository.Interfaces;
 using FOS.Users.Api;
@@ -62,8 +63,11 @@ builder.Services.AddTransient<IRequestHandler<GetUserByUserNameAndPassword.Query
 builder.Services.AddTransient<IRequestHandler<GetUserMenusByUserId.Query, List<UserMenu>>, GetUserMenusByUserId.Handler>();
 
 builder.Services.AddTransient<IUsermanagementRepository>(s => new UserManagementRepository(configuration.GetConnectionString("FOSConnectionString")!));
+builder.Services.AddTransient<IUsermanagementRepository>(s => new UserManagementRepository(configuration.GetConnectionString("FOSConnectionString")!));
 builder.Services.AddTransient<IRequestHandler<UserLevelLookup.Query, List<Lookup>>, UserLevelLookup.Handler>();
-builder.Services.AddTransient<IRequestHandler<GetUserdesignationlevelLookups.Query, List<Lookup>>, GetUserdesignationlevelLookups.Handler>();
+builder.Services.AddTransient<IRequestHandler<GetUserDesignationlevelLookups.Query, List<Lookup>>, GetUserDesignationlevelLookups.Handler>();
+builder.Services.AddTransient<IRequestHandler<ViewUserDetails.Query, InsertUserDetailsModel>, ViewUserDetails.Handler>();
+builder.Services.AddTransient<IRequestHandler<GetUsertranslanderInfrastructure.Query, GetUserTranslanderModel>, GetUsertranslanderInfrastructure.Handler>();
 builder.Host.UseSerilog((context, configuration) =>
     configuration.ReadFrom.Configuration(context.Configuration));
 
