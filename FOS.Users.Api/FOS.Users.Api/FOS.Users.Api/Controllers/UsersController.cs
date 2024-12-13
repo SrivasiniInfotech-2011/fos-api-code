@@ -90,13 +90,7 @@ namespace FOS.Users.Api.Controllers
             }
             catch (Exception ex)
             {
-                return ErrorResponse(new Models.Responses.FOSMessageResponse
-                {
-                    StatusCode = System.Net.HttpStatusCode.BadRequest,
-                    Error = new FOSErrorResponse { Exception = ex },
-                    Request = loginRequest,
-
-                });
+                return new BadRequestObjectResult(ex);
             }
         }
 
