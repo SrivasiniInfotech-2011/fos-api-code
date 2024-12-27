@@ -1,3 +1,4 @@
+using FOS.Infrastructure.Commands;
 using FOS.Infrastructure.Queries;
 using FOS.Models.Constants;
 using FOS.Models.Entities;
@@ -10,6 +11,7 @@ using IdentityServer4.AccessTokenValidation;
 using MediatR;
 using Microsoft.OpenApi.Models;
 using Serilog;
+using System.Collections.Generic;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -66,8 +68,11 @@ builder.Services.AddTransient<IUsermanagementRepository>(s => new UserManagement
 builder.Services.AddTransient<IUsermanagementRepository>(s => new UserManagementRepository(configuration.GetConnectionString("FOSConnectionString")!));
 builder.Services.AddTransient<IRequestHandler<UserLevelLookup.Query, List<Lookup>>, UserLevelLookup.Handler>();
 builder.Services.AddTransient<IRequestHandler<GetUserDesignationlevelLookups.Query, List<Lookup>>, GetUserDesignationlevelLookups.Handler>();
-builder.Services.AddTransient<IRequestHandler<ViewUserDetails.Query, InsertUserDetailsModel>, ViewUserDetails.Handler>();
-builder.Services.AddTransient<IRequestHandler<GetUsertranslanderInfrastructure.Query, GetUserTranslanderModel>, GetUsertranslanderInfrastructure.Handler>();
+builder.Services.AddTransient<IRequestHandler<ViewUserDetails.Query, GetInsertUserDetailsModel>, ViewUserDetails.Handler>();
+//builder.Services.AddTransient<IRequestHandler<GetUsertranslanderInfrastructure.Query, GetUserTranslanderModel>, GetUsertranslanderInfrastructure.Handler>();
+builder.Services.AddTransient<IRequestHandler<GetUsertranslanderInfrastructure.Query, List <GetUserTranslanderModel>>, GetUsertranslanderInfrastructure.Handler>();
+builder.Services.AddTransient<IRequestHandler<UserReportinglevel.Query, List <ReportingLevel>>, UserReportinglevel.Handler>();
+builder.Services.AddTransient<IRequestHandler<InsertUserDetails.Command, int>, InsertUserDetails.Handler>();
 builder.Host.UseSerilog((context, configuration) =>
     configuration.ReadFrom.Configuration(context.Configuration));
 

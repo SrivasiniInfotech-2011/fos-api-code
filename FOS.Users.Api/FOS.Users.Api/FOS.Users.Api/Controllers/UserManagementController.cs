@@ -5,7 +5,7 @@ using FOS.Models.Entities;
 using FOS.Models.Requests;
 using FOS.Models.Responses;
 using MediatR;
-
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using static FOS.Models.Constants.Constants;
@@ -14,6 +14,7 @@ namespace FOS.Users.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    
     public class UserManagementController : FOSControllerBase
     {
 
@@ -95,6 +96,39 @@ namespace FOS.Users.Api.Controllers
         }
 
 
+        /// <summary>
+        /// Get the UserDesignationLevel Lookup.
+        /// </summary>
+        [HttpPost]
+        [Route("GetUserreportinglevel")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(byte[]), StatusCodes.Status200OK, Web.ContentType.Json)]
+        [ProducesResponseType(typeof(FOSBaseResponse), StatusCodes.Status400BadRequest, Web.ContentType.Json)]
+        [ProducesResponseType(typeof(FOSBaseResponse), StatusCodes.Status500InternalServerError, Web.ContentType.Json)]
+
+        public async Task<IActionResult> GetUserreportingevelLookup(UserReportingLevelLookup UserReporting)
+        {
+            try
+            {
+                var query = new UserReportinglevel.Query(UserReporting.CompanyId, UserReporting.UserId,UserReporting.PrefixText);
+                var lookup = await FOSMediator.Send(query);
+
+                return Ok(new FOSResponse
+                {
+                    Status = Status.Success,
+                    Message = lookup
+                });
+            }
+            catch (Exception ex)
+            {
+                return ErrorResponse(new Models.Responses.FOSMessageResponse
+                {
+                    StatusCode = System.Net.HttpStatusCode.BadRequest,
+                    Error = new FOSErrorResponse { Exception = ex }
+
+                });
+            }
+        }
 
 
 
