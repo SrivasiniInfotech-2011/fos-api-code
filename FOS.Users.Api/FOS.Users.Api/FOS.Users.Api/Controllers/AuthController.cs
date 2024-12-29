@@ -19,14 +19,14 @@ namespace FOS.Users.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UsersController : FOSControllerBase
+    public class AuthController : FOSControllerBase
     {
         private readonly IConfiguration _configuration;
         /// <summary>
         /// Constructor For ApartmentsController
         /// </summary>
         /// <param name="mediator"></param>
-        public UsersController(IConfiguration configuration, IMediator mediator, IMapper mapper, ILogger<UsersController> logger) : base(mediator, logger, mapper)
+        public AuthController(IConfiguration configuration, IMediator mediator, IMapper mapper, ILogger<AuthController> logger) : base(mediator, logger, mapper)
         {
             _configuration = configuration;
         }

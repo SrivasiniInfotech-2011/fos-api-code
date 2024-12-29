@@ -1,0 +1,12 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs
+/FOS.Users.Api/FOS.Users.Api/.vs/FOS.Users.Api
+/FOS.Users.Api/FOS.Users.Api/FOS.Users.Api/.config
+/FOS.Users.Api/FOS.Users.Api/FOS.Users.Api/bin
+/FOS.Users.Api/FOS.Users.Api/FOS.Users.Api/obj
+/FOS.Users.Api/FOS.Users.Api/FOS.Users.Api/Properties
+/FOS.Users.Api/FOS.Users.Api/FOS.Users.Api/FOS.Users.Api.csproj.user
+/FOS.Users.Api.zip
