@@ -70,7 +70,7 @@ builder.Services.AddTransient<IUsermanagementRepository>(s => new UserManagement
 builder.Services.AddTransient<IUsermanagementRepository>(s => new UserManagementRepository(configuration.GetConnectionString("FOSConnectionString")!));
 builder.Services.AddTransient<IRequestHandler<UserLevelLookup.Query, List<Lookup>>, UserLevelLookup.Handler>();
 builder.Services.AddTransient<IRequestHandler<GetUserDesignationlevelLookups.Query, List<Lookup>>, GetUserDesignationlevelLookups.Handler>();
-builder.Services.AddTransient<IRequestHandler<ViewUserDetails.Query, List<GetInsertUserDetailsModel>>, ViewUserDetails.Handler>();
+builder.Services.AddTransient<IRequestHandler<ViewUserDetails.Query, GetInsertUserDetailsModel>, ViewUserDetails.Handler>();
 //builder.Services.AddTransient<IRequestHandler<GetUsertranslanderInfrastructure.Query, GetUserTranslanderModel>, GetUsertranslanderInfrastructure.Handler>();
 builder.Services.AddTransient<IRequestHandler<GetUsertranslanderInfrastructure.Query, List<GetUserTranslanderModel>>, GetUsertranslanderInfrastructure.Handler>();
 builder.Services.AddTransient<IRequestHandler<UserReportinglevel.Query, List<ReportingLevel>>, UserReportinglevel.Handler>();
