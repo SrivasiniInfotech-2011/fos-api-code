@@ -101,7 +101,7 @@ namespace FOS.Users.Api.Controllers
         /// </summary>
         [HttpPost]
         [Route("GetUserreportinglevel")]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)] 
         [ProducesResponseType(typeof(byte[]), StatusCodes.Status200OK, Web.ContentType.Json)]
         [ProducesResponseType(typeof(FOSBaseResponse), StatusCodes.Status400BadRequest, Web.ContentType.Json)]
         [ProducesResponseType(typeof(FOSBaseResponse), StatusCodes.Status500InternalServerError, Web.ContentType.Json)]
@@ -110,7 +110,7 @@ namespace FOS.Users.Api.Controllers
         {
             try
             {
-                var query = new UserReportinglevel.Query(UserReporting.CompanyId, UserReporting.UserId,UserReporting.PrefixText);
+                var query = new UserReportinglevel.Query(UserReporting.CompanyId, UserReporting.UserId,UserReporting.PrefixText,UserReporting.LOB_ID, UserReporting.location_ID);
                 var lookup = await FOSMediator.Send(query);
 
                 return Ok(new FOSResponse
