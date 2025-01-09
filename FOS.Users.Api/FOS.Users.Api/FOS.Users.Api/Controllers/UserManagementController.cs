@@ -110,7 +110,7 @@ namespace FOS.Users.Api.Controllers
         {
             try
             {
-                var query = new UserReportinglevel.Query(UserReporting.CompanyId, UserReporting.UserId,UserReporting.PrefixText);
+                var query = new UserReportinglevel.Query(UserReporting.CompanyId, UserReporting.UserId,UserReporting.PrefixText,UserReporting.LOB_ID, UserReporting.location_ID);
                 var lookup = await FOSMediator.Send(query);
 
                 return Ok(new FOSResponse
