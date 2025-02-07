@@ -10,26 +10,21 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
-using System.Reflection.Metadata;
 using System.Security.Claims;
 using System.Text;
 using static FOS.Models.Constants.Constants;
 
 namespace FOS.Users.Api.Controllers
 {
+    /// <summary>
+    /// Constructor For ApartmentsController
+    /// </summary>
+    /// <param name="mediator"></param>
     [Route("api/[controller]")]
     [ApiController]
-    public class AuthController : FOSControllerBase
+    public class AuthController(IConfiguration configuration, IMediator mediator, IMapper mapper, ILogger<AuthController> logger) : FOSControllerBase(mediator, logger, mapper)
     {
-        private readonly IConfiguration _configuration;
-        /// <summary>
-        /// Constructor For ApartmentsController
-        /// </summary>
-        /// <param name="mediator"></param>
-        public AuthController(IConfiguration configuration, IMediator mediator, IMapper mapper, ILogger<AuthController> logger) : base(mediator, logger, mapper)
-        {
-            _configuration = configuration;
-        }
+        private readonly IConfiguration _configuration = configuration;
 
         /// <summary>
         /// Get All Users.
@@ -70,6 +65,7 @@ namespace FOS.Users.Api.Controllers
                 ArgumentNullException.ThrowIfNull(loginRequest.Password, nameof(loginRequest.Password));
                 var query = new GetUserByUserNameAndPassword.Query(loginRequest.UserName, loginRequest.Password);
                 var user = await FOSMediator.Send(query);
+
                 if (user == null)
                     return new BadRequestObjectResult(new Models.Responses.FOSMessageResponse
                     {
@@ -79,7 +75,19 @@ namespace FOS.Users.Api.Controllers
                             Message = Constants.Messages.INVALID_USER,
                         }
                     });
-
+                else
+                {
+                    var userPassword = AppUtil.DecryptString(user.Passsword!);
+                    if (userPassword != loginRequest.Password)
+                        return new BadRequestObjectResult(new Models.Responses.FOSMessageResponse
+                        {
+                            StatusCode = System.Net.HttpStatusCode.BadRequest,
+                            Error = new FOSErrorResponse
+                            {
+                                Message = Constants.Messages.INVALID_USER,
+                            }
+                        });
+                }
                 var userToken = await IdentityServer4Client.LoginAsync(_configuration[Constants.IdentityServerConfigurationKey]!, loginRequest.UserName, loginRequest.Password);
                 user.SessionExpireDate = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + userToken.ExpiresIn;
                 return Ok(new FOSResponse
